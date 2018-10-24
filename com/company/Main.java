@@ -1,32 +1,41 @@
 package com.company;
 
+import com.company.items.*;
 import com.company.people.*;
 
+import java.util.Scanner;
+
 public class Main {
-    public static void trade(Item item, Customer u, Cashier a) {
-        a.sell(item);
-        u.purchase(item);
-    }
     public static void main(String[] args) {
-        Shop chetvorochka = new Shop(1000000.0);
-        Cashier p = new Cashier("Pyotr", 3000);
-        Cashier v = new Cashier();
-        Customer i = new Customer();
-        Customer r = new Customer("Vladimir", 10000);
-        Item meat = new Item("Meat", 27.5);
-        Item milk = new Item("Milk", 60);
-        Item bread = new Item("Bread", 10);
-        Item sugar = new Item("Sugar", 20.15);
-        chetvorochka.getShipment(sugar, 100);
-        chetvorochka.getShipment(bread, 500);
-        i.enter();
-        r.enter();
-        trade(bread, i, p);
-        trade(milk, r, v);
-        trade(meat, r, p);
-        v.getPaid(20000);
-        System.out.println(r.getBag());
-        System.out.println(v.getCash());
-        System.out.println(r.getCash());
+        Scanner sc = new Scanner(System.in);
+        Shop fiver = new Shop(1000000);
+        Item bread = new Bread();
+        Item beer = new Beer();
+        Item fruit = new Fruit();
+        Item milk = new Milk();
+        Item wine = new Wine();
+        fiver.getShipment(bread, 500);
+        fiver.getShipment(beer, sc.nextInt());
+        fiver.getShipment(fruit, 1000);
+        fiver.getShipment(milk, 300);
+        Staff boris = new Cashier(sc.nextInt());
+        Staff pyotr = new Cashier(1000);
+        Staff ivan = new Janitor(500);
+        Customer vasya = new Youth(5000);
+        Customer vladimir = new Customer(10000);
+        fiver.accept(boris);
+        fiver.accept(ivan);
+        fiver.accept(pyotr);
+        fiver.startDay();
+        vasya.enterShop(fiver);
+        vladimir.enterShop(fiver);
+        vasya.buy(bread, 1);
+        vasya.buy(beer, 2);
+        vladimir.buy(wine, 1);
+        vladimir.buy(fruit, 10);
+        vladimir.buy(milk, 3);
+        fiver.endDay();
+        System.out.println(vasya.getBag());
+        System.out.println(vladimir.getBag());
     }
 }

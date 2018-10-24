@@ -1,28 +1,56 @@
 package com.company;
 
+import com.company.items.Item;
+import com.company.items.Perishable;
+import com.company.people.*;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Shop {
-    protected int items_sold;
     private double funds;
-    protected ArrayList<Item> items = new ArrayList<>(0);
-    protected ArrayList<Integer> amounts = new ArrayList<>(0);
-    public Shop() {
-        funds = 0;
+    private ArrayList<Item> stock;
+    private ArrayList<Staff> staff;
+    public Shop(double funds) {
+        this.funds = funds;
+        stock = new ArrayList<>();
+        staff = new ArrayList<>();
     }
-    public Shop(double money) {
-        funds = money;
+    public ArrayList<Item> getStock() {
+        return stock;
     }
-    public void earn(double amount) {
-        funds += amount;
+    public ArrayList<Staff> getStaff() {
+        return staff;
     }
-    public void getShipment(Item item, int amount) {
-        double a = item.bulkCost(amount);
-        if(funds >= a) {
-            items.add(item);
-            amounts.add(amount);
-            funds -= a;
-        } else
-            System.out.println("Too expensive, shipment has to be smaller!");
+    public void getShipment(Item item, int quan) {
+        double c = item.getCost();
+        funds -= c * quan - (quan - 1) / c;
+        for (int i = 0; i < quan; i++)
+            stock.add(item);
+    }
+    public void accept(Staff member) {
+        staff.add(member);
+        member.setJob(this);
+    }
+    public void remove(Item item) {
+        stock.remove(item);
+    }
+    public void startDay() {
+        for(Staff s : staff)
+            if(s instanceof Janitor)
+                ((Janitor)s).clean();
+    }
+    public void endDay() {
+        for(Staff s : staff) {
+            s.getPaid();
+            if(s instanceof Cashier)
+                funds += ((Cashier)s).getRegister();
+        }
+        Random r = new Random();
+        for(Item i : stock) {
+            if(i instanceof Perishable)
+                if (r.nextInt(((Perishable)i).getExpiryChance()) == 0)
+                    ((Perishable)i).expire();
+        }
     }
 }

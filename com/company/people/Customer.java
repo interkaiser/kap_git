@@ -1,48 +1,42 @@
 package com.company.people;
 
-import com.company.Item;
+import com.company.Shop;
+import com.company.items.Alcohol;
+import com.company.items.Item;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Customer extends Person {
-    private ArrayList bag = new ArrayList(0);
-    public Customer() {}
-    public Customer(String name, double cash) {
-        super(name, cash);
+    private ArrayList<Item> bag;
+    private Cashier buys_from;
+    public Customer(double wallet) {
+        super(wallet);
+        bag = new ArrayList<>();
     }
-    public void purchase(Item item) {
-        if(!isInShop) {
-            System.out.println(getName() + " is not in the shop!");
+    public void enterShop(Shop shop) {
+        ArrayList<Cashier> temp = new ArrayList<>();
+        for(Staff c : shop.getStaff())
+            if(c instanceof Cashier)
+                temp.add((Cashier)c);
+        Random r = new Random();
+        int i = r.nextInt(temp.size());
+        buys_from = temp.get(i);
+    }
+    public void buy(Item item, int quan) {
+        if(item instanceof Alcohol && this instanceof Youth) {
+            System.out.println("Too young for alcohol!");
             return;
         }
-        if(!items.contains(item)) {
-            System.out.println(item.getName() + " is out of stock!");
-            return;
-        }
-        if(cash >= item.getCost()) {
-            if (items_sold > 0) {
-                get(-item.getCost());
-                int a = items.indexOf(item);
-                if (bag.contains(item)) {
-                    bag.set(a, amounts.get(a) - 1);
-                } else {
-                    bag.add(item);
-                    bag.add(1);
-                }
-                amounts.set(a, amounts.get(a) - 1);
-            }
-        } else System.out.println(this.getName() + " can't afford " + item.getName() + "!");
+        buys_from.sell(item, quan);
+        spendMoney(item.getCost() * quan);
+        for (int i = 0; i < quan; i++)
+            bag.add(item);
     }
     public String getBag() {
-        StringBuilder s = new StringBuilder();
-        s.append(getName() + " has:\n");
-        if(!bag.isEmpty()) {
-            for (int i = 0; i < bag.size(); i += 2) {
-                s.append(bag.get(i).toString());
-                s.append(bag.get(i + 1) + "\n");
-            }
-        } else
-            s.append("Nothing");
-        return s.toString();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < bag.size(); i++)
+            b.append(String.format("%s; ", bag.get(i).toString()));
+        return b.append("\n").toString();
     }
 }
